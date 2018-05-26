@@ -13,6 +13,11 @@ var connection = mysql.createConnection({
     database: "bamazon_DB"
 })
 
+connection.connect(function(err) {
+    if (err) throw err;
+    managerTask();
+  });
+
 function managerTask()  {
     inquire.prompt([
         {
@@ -128,15 +133,12 @@ function newItem()  {
                 department_name: post.department,
                 price: post.price,
                 quanity: post.quanity
-            }, function(err,res)
-         {
+            }, function(err,res)  {
                         if(err) throw err;
                         displayInventory();
-                    })
-        
+                })
     })
 
 }
 
 
-managerTask();

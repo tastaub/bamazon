@@ -12,6 +12,12 @@ var connection = mysql.createConnection({
     database: "bamazon_DB"
 })
 
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+    displayStore();
+  });
+
 function displayStore()  {
     console.log(`
      ____   ___  __   __  ___  _________  __  _ 
@@ -23,14 +29,14 @@ function displayStore()  {
     var search = "SELECT * FROM products";
     connection.query(search, function(err, res)  {
         if(err)  throw err; 
-        console.log("You in");
         for(var i = 0; i < res.length; i++)  {
             console.log(`
          ID: ${res[i].id}    NAME: ${res[i].product_name}    DEPARTMENT: ${res[i].department_name} 
                 PRICE: $ ${res[i].price}       QUANITY: ${res[i].quanity}`)
         }
+        getItems();
     })
-    getItems();
+    
 }
 
 function getItems()  {
@@ -59,8 +65,11 @@ function getItems()  {
                 console.log("This is too many items");
                 displayStore();
             } else {
+                var sales = input.quanity * res[0].price;
+                var department = res[0].department_name
                 connection.query('UPDATE products SET ? WHERE ?', [{
-                    quanity: res[0].quanity - input.quanity
+                    quanity: res[0].quanity - input.quanity,
+                    product_sales: input.quanity * res[0].price
                 },  {
                     id: input.id
                 }], function(err, update)  {
@@ -72,10 +81,10 @@ function getItems()  {
                 
                 Quanity: ${input.quanity}    $${res[0].price}
 
-                Total $ ${input.quanity * res[0].price}
+                Total $ ${sales}
             -----------------------------------------------      
                         ~Thank You Come Again~`)
-                    connection.end();
+                    updateDpt(sales, department);
                 })
             }
                 
@@ -85,6 +94,31 @@ function getItems()  {
     })
 }
 
+function updateDpt(sales, dpt)  {
+    connection.query("SELECT * FROM departments WHERE ?",
+    [{
+        dpt_name: dpt,
+    }
+    ],function(err,res)  {
+        if(err) throw err
+        connection.query("UPDATE departments SET ? WHERE ?",[{
+            dpt_sales: res[0].dpt_sales + sales
+        },  {
+            dpt_name: res[0].dpt_name
+        }], function(err, dptSales)  {
+            if(err)  throw err;
+            console.log(res[0].dpt_sales);
+            connection.end();
+        })
+    })
+    
+    
+    // connection.query("UPDATE departments SET ? WHERE ?",[{
+    //     dpt_sales: sales + 
+    // },  {
 
+    // }]
+    // function(err,results)  {
 
-displayStore();
+    // })
+}
