@@ -24,11 +24,15 @@ function managerTask()  {
     ]).then(function(task)  {
         if(task.mgrTask === 'View Products For Sale')  {
             displayInventory();
+            
         } else if(task.mgrTask === 'View Low Inventory')  {
             lowInventory();
+            
         } else if(task.mgrTask === 'Add To Inventory')  {
             addQuanity();
+            
         } else if(task.mgrTask === 'Add Product')  {
+            newItem();
             
         }
     })
@@ -93,8 +97,46 @@ function addQuanity()  {
             })
         })
     })
+
 }
 
 // INSERT INTO table(x,y,z,a)  VALUES (dd,ee,ss,rr) add product
+function newItem()  {
+    inquire.prompt([
+        {
+            type: "input",
+            name: 'product',
+            message: "Product Name"
+        },  {
+            type: "input",
+            name: 'department',
+            message: "Department"
+        },  {
+            type: "input",
+            name: 'price',
+            message: "Item Price $"
+        },  {
+            type: "input",
+            name: 'quanity',
+            message: "Receive Quanity"
+        }
+    ]).then(function(post)  {
+        
+        connection.query("INSERT INTO products SET ?",
+            {
+                product_name: post.product,
+                department_name: post.department,
+                price: post.price,
+                quanity: post.quanity
+            }, function(err,res)
+         {
+                        if(err) throw err;
+                        displayInventory();
+                    })
+        
+    })
+
+}
+
 
 managerTask();
