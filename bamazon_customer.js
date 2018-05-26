@@ -30,10 +30,10 @@ function displayStore()  {
                 PRICE: $ ${res[i].price}       QUANITY: ${res[i].quanity}`)
         }
     })
-    idPrompt();
+    getItems();
 }
 
-function idPrompt()  {
+function getItems()  {
     inquire.prompt([
         {
             type: "input",
@@ -43,48 +43,79 @@ function idPrompt()  {
         },  {
             type: "submit",
             name: "quanity",
-            message: "How many would you like?"
+            message: "How many would you like?",
+            validate: function(value){
+                var valid = value.match(/^[0-9]+$/)
+                if(valid){
+                    return true
+                }
+                    return 'Please enter a numerical value'
+            }
         }
-    ]).then(function(res)  {
+    ]).then(function(input)  {
+        connection.query('SELECT * FROM products WHERE id=?', [input.id], function(err,res)  {
+            if(err)  throw err;
+            if(input.quanity > res[0].quanity)  {
+                console.log("This is too many items");
+                displayStore();
+            } else {
+                connection.query('UPDATE products SET ? WHERE ?', [{
+                    quanity: res[0].quanity - input.quanity
+                },  {
+                    id: input.id
+                }], function(err, update)  {
+                    
+                    console.log(`
+                            Bamazon Receipt
+            -----------------------------------------------
+                Item:   ${res[0].product_name}
+                
+                Quanity: ${input.quanity}    $${res[0].price}
+
+                Total $ ${input.quanity * res[0].price}
+            -----------------------------------------------      
+                        ~Thank You Come Again~`)
+                    connection.end();
+                })
+            }
+                
+                
+        })
         
-        var quanity = parseFloat(res.quanity);
-        var product = res.id;
-        var search = "SELECT * FROM products WHERE ID=" + product;
-        getOrder(search, quanity);
     })
 }
 
-function getOrder(query, quanity)  {
-    connection.query(query, function(err, response)  {
-        if(err)  throw err;
-        console.log(`
-        ${response[0].product_name}    
-            $ ${response[0].price}
-            ${response[0].quanity}
-        `);
-        var price = response[0].price * quanity;
-        var stock = (response[0].quanity -= quanity);
-        console.log(quanity);
-        var product = parseFloat(response[0].id);
-        if(quanity <= response[0].quanity)  {
-            console.log("This is your total")
-            updateDb(stock,product,price);
+// function getOrder(query, quanity)  {
+//     connection.query(query, function(err, response)  {
+//         if(err)  throw err;
+//         console.log(`
+//         ${response[0].product_name}    
+//             $ ${response[0].price}
+//             ${response[0].quanity}
+//         `);
+//         var price = response[0].price * quanity;
+//         var stock = (response[0].quanity -= quanity);
+//         console.log(quanity);
+//         var product = parseFloat(response[0].id);
+//         if(quanity <= response[0].quanity)  {
+//             console.log("This is your total")
+//             updateDb(stock,product,price);
             
-        } else  {
-            console.log("Not enough stock");
-            connection.end();
-        }
-    })
-}
+//         } else  {
+//             console.log("Not enough stock");
+//             connection.end();
+//         }
+//     })
+// }
 
-function updateDb(stock,id,cost)  {
-    var search = `UPDATE products SET quanity=${stock} WHERE id=${id}`;
+// function updateDb(stock,id,cost)  {
+//     var search = `UPDATE products SET quanity=${stock} WHERE id=${id}`;
     
-    connection.query(search, function(err, response)  {
-        if(err)  throw err;
-        connection.end();
-    })
-}
+//     connection.query(search, function(err, response)  {
+//         if(err)  throw err;
+//         connection.end();
+//     })
+// }
 
 // function confirmOrder()
 displayStore();
