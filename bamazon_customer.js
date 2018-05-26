@@ -85,37 +85,6 @@ function getItems()  {
     })
 }
 
-// function getOrder(query, quanity)  {
-//     connection.query(query, function(err, response)  {
-//         if(err)  throw err;
-//         console.log(`
-//         ${response[0].product_name}    
-//             $ ${response[0].price}
-//             ${response[0].quanity}
-//         `);
-//         var price = response[0].price * quanity;
-//         var stock = (response[0].quanity -= quanity);
-//         console.log(quanity);
-//         var product = parseFloat(response[0].id);
-//         if(quanity <= response[0].quanity)  {
-//             console.log("This is your total")
-//             updateDb(stock,product,price);
-            
-//         } else  {
-//             console.log("Not enough stock");
-//             connection.end();
-//         }
-//     })
-// }
 
-// function updateDb(stock,id,cost)  {
-//     var search = `UPDATE products SET quanity=${stock} WHERE id=${id}`;
-    
-//     connection.query(search, function(err, response)  {
-//         if(err)  throw err;
-//         connection.end();
-//     })
-// }
 
-// function confirmOrder()
 displayStore();
