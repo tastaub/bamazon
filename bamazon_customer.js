@@ -1,6 +1,7 @@
 require('dotenv').config();
 var mysql = require('mysql');
 var inquire = require('inquirer');
+var Table = require('easy-table');
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -25,15 +26,24 @@ function displayStore()  {
     | |_) ) |_| |   v   | |_| |  / / | | |  |/ |
     |  _ (|  _  | | _/| |  _  | / /| | | |     |
     | |_) ) | | | |   | | | | |/ /_| |_| | |_  |
-    |____/|_| |_|_|   |_|_| |_/_____)___/|_| |_|`)
+    |____/|_| |_|_|   |_|_| |_/_____)___/|_| |_|
+    `)
     var search = "SELECT * FROM products";
     connection.query(search, function(err, res)  {
         if(err)  throw err; 
-        for(var i = 0; i < res.length; i++)  {
-            console.log(`
-         ID: ${res[i].id}    NAME: ${res[i].product_name}    DEPARTMENT: ${res[i].department_name} 
-                PRICE: $ ${res[i].price}       QUANITY: ${res[i].quanity}`)
-        }
+        var data = res
+        var t = new Table
+ 
+            data.forEach(function(product) {
+            t.cell('Item ID', product.id)
+            t.cell('Item Name', product.product_name)
+            t.cell('Department Name', product.department_name)
+            t.cell('Price', product.price)
+            t.cell('Quanity Available', product.quanity);
+            t.newRow()
+            })
+            
+            console.log(t.toString())
         getItems();
     })
     
@@ -73,7 +83,7 @@ function getItems()  {
                 },  {
                     id: input.id
                 }], function(err, update)  {
-                    
+                    if(err) throw err;
                     console.log(`
                             Bamazon Receipt
             -----------------------------------------------
@@ -107,7 +117,6 @@ function updateDpt(sales, dpt)  {
             dpt_name: res[0].dpt_name
         }], function(err, dptSales)  {
             if(err)  throw err;
-            console.log(res[0].dpt_sales);
             connection.end();
         })
     })
