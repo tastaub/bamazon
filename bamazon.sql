@@ -9,30 +9,30 @@ CREATE TABLE products(
     department_name VARCHAR(50),
     price DECIMAL(20,2) NOT NULL,
     quanity INT(15) NOT NULL,
-    product_sales DECIMAL(10,2),
-    cost_of_goods DECIMAL(10,2),
+    product_sales DECIMAL(10,2) NOT NULL,
+    prod_cost DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE departments(
 	id INT NOT NULL AUTO_INCREMENT,
     dpt_name VARCHAR(50) NOT NULL,
-    dpt_cost DECIMAL(10,2),
-    dpt_sales INTEGER(15),
+    dpt_cost DECIMAL(10,2) NOT NULL,
+    dpt_sales INTEGER(15) NOT NULL,
     PRIMARY KEY(id)
 );
 
-INSERT INTO products(product_name, department_name, price, quanity)
-VALUES  ("Clorox", "Cleaning", 4.99, 200), 
-        ("Kit Kats", "Candy", 2.50, 4000), 
-        ("PS4", "Video Games", 399, 400), 
-        ("XBOX One", "Video Games", 500, 3000),
-        ("Walkman", "Electronis", 12.99, 12), 
-        ("Super Soaker", "Toys", 39, 362), 
-        ("Slip n Slined", "Outdoor", 29.99, 1234), 
-        ("Ping Pong Table", "Sports", 120, 32),
-        ("Tennis Racquet", "Sports",  209, 23), 
-        ("Dinosuar Bones", "Misc", 200000000, 1);
+INSERT INTO products(product_name, department_name, price, quanity, product_sales, prod_cost)
+VALUES  ("Clorox", "Cleaning", 4.99, 200, 0, 1.35), 
+        ("Kit Kats", "Candy", 2.50, 4000, 0, 0.84), 
+        ("PS4", "Video Games", 399, 400, 0, 124.32), 
+        ("XBOX One", "Video Games", 500, 3000, 0, 232.12),
+        ("Walkman", "Electronis", 12.99, 12, 0, 0.49), 
+        ("Super Soaker", "Toys", 39, 362, 0, 29.32), 
+        ("Slip n Slined", "Outdoor", 29.99, 1234, 0, 12.99), 
+        ("Ping Pong Table", "Sports", 120, 32, 0, 109),
+        ("Tennis Racquet", "Sports",  209, 23, 0, 102.21), 
+        ("Dinosuar Bones", "Misc", 200000000, 12, 0, 3000);
 
 
 INSERT INTO departments(dpt_name, dpt_cost, dpt_sales)

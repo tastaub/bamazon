@@ -29,13 +29,48 @@ function superPrompt()  {
     ]).then(function(res)  {
         
         if(res.supervisor === "Display Inventory")  {
-            displayStock();
+            updateCost().then(updateDpt).then(displayStock);
         } else if(res.supervisor === "Add Department")  {
             createDepartment();
         }
        
     })
 };
+
+function updateCost()  {
+    return new Promise((resolve,reject) =>  {
+        connection.query("SELECT * FROM products", function(err,res)  {
+            if(err) reject(err);
+            res.forEach((prod) => {
+                var overhead = prod.quanity * prod.prod_cost;
+                var costData = {
+                    cost: overhead,
+                    dpt: prod.department_name,
+                }
+                resolve(costData);
+            })
+            
+        })
+    })
+}
+
+function updateDpt(data)  {
+    data.forEach(function(prods)  {
+    return new Promise((resolve,reject) =>  {
+            connection.query("UPDATE departments SET ? WHERE ?",[
+                {
+                    dpt_cost: prods.cost
+                },  {
+                    dpt_name: prods.dpt
+                }
+            ], function(err,res)  {
+                if(err) reject(err);
+                console.log(prods)
+                resolve(prods);
+            })    
+    })
+    })
+}
 
 function displayStock()  {
     connection.query("SELECT * FROM departments", function(err,result)  {
