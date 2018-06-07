@@ -18,48 +18,46 @@ connection.connect(function(err) {
   managerTask();
 });
 
+var mgrPrompt = [
+  {
+    type: "list",
+    name: "mgrTask",
+    message: "What is your task?",
+    choices: [
+      "View Items",
+      "View Low Inventory",
+      "Add To Inventory",
+      "Add Product",
+      "Exit"
+    ]  
+  }
+]
+
 function managerTask() {
-  inquire
-    .prompt([
-      {
-        type: "list",
-        name: "mgrTask",
-        message: "What is your task?",
-        choices: [
-          "View Items",
-          "View Low Inventory",
-          "Add To Inventory",
-          "Add Product",
-          "Exit"
-        ]
-      }
-    ])
-    .then(function(task) {
-      if (task.mgrTask === "View Items") {
-        displayInventory().then(managerTask);
-      } else if (task.mgrTask === "View Low Inventory") {
-        lowInventory().then(managerTask);
-      } else if (task.mgrTask === "Add to Inventory") {
-        displayInventory().then(addAsk);
-      } else if (task.mgrTask === "Add Product") {
-        createItem().then(newItem);
-      } else if (task.mgrTask === "Exit") {
-        connection.end();
+  inquire.prompt(mgrPrompt).then(function(task) {
+      switch(task.mgrTask)  {
+        case "View Items": return getProd().then(managerTask);
+          break;
+        case "View Low Inventory": return getLow().then(displayInventory);
+          break;
+        case "Add To Inventory": return getProd().then(addAsk);
+          break;
+        case "Add Product": return createItem().then(newItem);
+          break;
+        case "Exit": return connection.end();
       }
     });
 }
 
 //SELECT * FROM view products
 
-function displayInventory() {
+function getProd() {
   return new Promise((resolve, reject) => {
     connection.query("SELECT * FROM products", function(err, res) {
       if (err) reject(err);
-
-      var data = res;
       var t = new Table();
 
-      data.forEach(function(product) {
+      res.forEach(function(product) {
         t.cell("Item ID", product.id);
         t.cell("Item Name", product.product_name);
         t.cell("Department Name", product.department_name);
@@ -67,50 +65,60 @@ function displayInventory() {
         t.cell("Quanity Available", product.quanity);
         t.newRow();
       });
-
+    
       console.log(t.toString());
       resolve(res);
     });
   });
 }
 
-//VIEW IF below x view low
-function lowInventory() {
+function getLow() {
   return new Promise((resolve, reject) => {
-    connection.query("SELECT * FROM products", function(err, lowStock) {
+    connection.query("SELECT * FROM products", function(err, res) {
       if (err) reject(err);
-      var t = new Table();
-      lowStock.forEach(function(product) {
-        if (product.quanity <= 120) {
-          t.cell("Item", product.product_name);
-          t.cell("Quanity", product.quanity);
-          t.newRow();
+      let data = [];
+      res.forEach(r => {
+        if (r.quanity <= 100) {
+          data.push(r);
         }
       });
-      console.log(t.toString());
-      resolve(lowStock);
+      resolve(data);
     });
   });
 }
 
+function displayInventory(update) {
+  var t = new Table();
+
+  update.forEach(function(product) {
+    t.cell("Item ID", product.id);
+    t.cell("Item Name", product.product_name);
+    t.cell("Department Name", product.department_name);
+    t.cell("Price $", product.price);
+    t.cell("Quanity Available", product.quanity);
+    t.newRow();
+  });
+
+  console.log(t.toString());
+  managerTask();
+}
+
+var stockPrompt = [
+  {
+    type: "input",
+    name: "prodId",
+    message: "Add to ID#"
+  },
+  {
+    type: "input",
+    name: "amount",
+    message: "Add Stock"
+  }
+]
+
+
 function addAsk() {
-  inquire
-    .prompt([
-      {
-        type: "input",
-        name: "prodId",
-        message: "Add to ID#"
-      },
-      {
-        type: "input",
-        name: "amount",
-        message: "Add Stock"
-      }
-    ])
-    .then(addQuanity)
-    .then(updateAdd)
-    .then(updateDisplay)
-    .then(managerTask);
+  inquire.prompt(stockPrompt).then(addQuanity).then(updateAdd).then(addDisplay).then(managerTask);
 }
 //UPDATE SET WHERE id add to
 function addQuanity(val) {
@@ -121,8 +129,12 @@ function addQuanity(val) {
       function(err, res) {
         if (err) reject(err);
         var add = parseFloat(val.amount) + parseFloat(res[0].quanity);
-
+        let r = res[0];
         var update = {
+          product: r.product_name,
+          department: r.department_name,
+          price: r.price,
+          cost: r.cost,
           quanity: add,
           id: val.prodId
         };
@@ -154,33 +166,6 @@ function updateAdd(update) {
   });
 }
 
-function updateDisplay(display) {
-  return new Promise((resolve, reject) => {
-    connection.query(
-      "SELECT * FROM products WHERE id=?",
-      [display.id],
-      function(err, res) {
-        if (err) reject(err);
-
-        var data = res;
-        var t = new Table();
-
-        data.forEach(function(product) {
-          t.cell("Item ID", product.id);
-          t.cell("Item Name", product.product_name);
-          t.cell("Department Name", product.department_name);
-          t.cell("Price $", product.price);
-          t.cell("Quanity Available", product.quanity);
-          t.newRow();
-        });
-
-        console.log(t.toString());
-        resolve(res);
-      }
-    );
-  });
-}
-
 function createItem() {
   return new Promise((resolve, reject) => {
     connection.query("SELECT dpt_name FROM departments", function(err, res) {
@@ -193,6 +178,9 @@ function createItem() {
     });
   });
 }
+
+
+
 // INSERT INTO table(x,y,z,a)  VALUES (dd,ee,ss,rr) add product
 function newItem(stuff) {
   inquire
@@ -201,27 +189,27 @@ function newItem(stuff) {
         type: "input",
         name: "product",
         message: "Product Name"
-      },
-      {
+      },  {
         type: "list",
         name: "department",
         choices: stuff,
         message: "Department"
-      },
-      {
+      },  {
         type: "input",
         name: "price",
         message: "Item Price $"
-      },
-      {
+      },  {
         type: "input",
         name: "quanity",
         message: "Receive Quanity"
+      },  {
+        type: 'input',
+        name: 'cost',
+        message: 'Item Cost'
       }
-    ])
-    .then(updateProd)
-    .then(addDisplay)
-    .then(managerTask);
+    ]
+    ).then(updateProd).then(addDisplay).then(managerTask);
+
 }
 
 function updateProd(post) {
@@ -233,7 +221,8 @@ function updateProd(post) {
         department_name: post.department,
         price: post.price,
         quanity: post.quanity,
-        product_sales: 0
+        product_sales: 0,
+        prod_cost: post.cost
       },
       function(err, res) {
         if (err) reject(err);
@@ -249,7 +238,8 @@ function addDisplay(stuff) {
   t.cell("Product Name", stuff.product);
   t.cell("Department", stuff.department);
   t.cell("Price", stuff.price);
-  t.cell("Quanity Added", stuff.quanity);
+  t.cell("Item Cost", stuff.cost);
+  t.cell("Quanity", stuff.quanity);
   t.newRow();
   console.log(t.toString());
 }

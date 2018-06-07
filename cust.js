@@ -15,18 +15,17 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId + "\n");
   welcome();
 });
 
 function welcome() {
   console.log(`
-    ____   ___  __   __  ___  _________  __  _ 
-   |  _   / _      /  |/  _  ___  / _   |  || |
-   | |_) ) |_| |   v   | |_| |  / / | | |  |/ |
-   |  _ (|  _  | | _/| |  _  | / /| | | |     |
-   | |_) ) | | | |   | | | | |/ /_| |_| | |_  |
-   |____/|_| |_|_|   |_|_| |_/_____)___/|_| |_|
+               ____   ___  __   __  ___  _________  __  _ 
+              |  _   / _  |  | |  |/  _  ___  / _  |  || |
+              | |_) ) |_| |   v   | |_| |  / / | | |  |/ |
+              |  _ (|  _  | ||^|| |  _  | / /| | | |     |
+              | |_) ) | | | |   | | | | |/ /_| |_| | |_  |
+              |____/|_| |_|_|   |_|_| |_/_____)___/|_| |_|  Created By: Thomas Staub
    `);
   inquire
     .prompt([
