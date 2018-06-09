@@ -2,13 +2,18 @@
 
 ## Bamazon 
 
-A node apllication using a MY SQL database. User has option to either act as customer, manager, and supervisor.
+A node aplication using a MySQL database. User has option to either act as customer, manager, and supervisor.
 
 ## Customer Mode
 
 Customer is prompted to enter item ID# to purchase an item.
 Enter the quanity desired, if quanity desired is more than available stock the program will alert low stock and restart the buying process.
 ![Customer Prompt](/images/customer.png)
+
+Receipt of sale and updates department sales table.
+![Customer Receipt](/images/cusbuy.png)
+![Customer Receipt](/images/susup.png)
+
 
 
 ## Manger Mode

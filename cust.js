@@ -135,10 +135,12 @@ function checkout(update) {
       ],
       function(err, res) {
         if (err) reject(err);
+        var sales = update.sales.toFixed(2);
         var t = new Table();
+
         t.cell("Product", update.name);
         t.cell("Quanity", update.amount);
-        t.cell("Total", update.sales);
+        t.cell("Total", `$${sales}`);
         t.newRow();
         console.log(t.toString());
         resolve(update);

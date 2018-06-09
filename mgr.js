@@ -61,7 +61,7 @@ function getProd() {
         t.cell("Item ID", product.id);
         t.cell("Item Name", product.product_name);
         t.cell("Department Name", product.department_name);
-        t.cell("Price $", product.price);
+        t.cell("Price", `$${product.price.toFixed(2)}`);
         t.cell("Quanity Available", product.quanity);
         t.newRow();
       });
@@ -94,7 +94,7 @@ function displayInventory(update) {
     t.cell("Item ID", product.id);
     t.cell("Item Name", product.product_name);
     t.cell("Department Name", product.department_name);
-    t.cell("Price $", product.price);
+    t.cell("Price", `$${product.price.toFixed(2)}`);
     t.cell("Quanity Available", product.quanity);
     t.newRow();
   });
@@ -236,7 +236,7 @@ function addDisplay(stuff) {
   var t = new Table();
   t.cell("Product Name", stuff.product);
   t.cell("Department", stuff.department);
-  t.cell("Price", stuff.price);
+  t.cell("Price", `$${stuff.price}`);
   t.cell("Quanity", stuff.quanity);
   t.newRow();
   console.log(t.toString());

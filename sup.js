@@ -85,10 +85,13 @@ function displayStock() {
       var t = new Table();
 
       data.forEach(function(product) {
+        var profit = product.dpt_sales - product.dpt_cost;
+        var p = profit.toFixed(2);
+        
         t.cell("Department Name", product.dpt_name);
-        t.cell("Department Cost", product.dpt_cost);
-        t.cell("Department Sales", product.dpt_sales);
-        t.cell("Profit", product.dpt_sales - product.dpt_cost);
+        t.cell("Department Cost", `$${product.dpt_cost.toFixed(2)}`);
+        t.cell("Department Sales", `$${product.dpt_sales.toFixed(2)}`);
+        t.cell("Profit", `$${p}`);
         t.newRow();
       });
       resolve(data);
