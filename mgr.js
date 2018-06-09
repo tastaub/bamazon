@@ -159,7 +159,6 @@ function updateAdd(update) {
       ],
       function(err, res) {
         if (err) reject(err);
-        console.log(update);
         resolve(update);
       }
     );
@@ -238,7 +237,6 @@ function addDisplay(stuff) {
   t.cell("Product Name", stuff.product);
   t.cell("Department", stuff.department);
   t.cell("Price", stuff.price);
-  t.cell("Item Cost", stuff.cost);
   t.cell("Quanity", stuff.quanity);
   t.newRow();
   console.log(t.toString());
