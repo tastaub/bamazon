@@ -2,7 +2,7 @@
 
 ## Bamazon 
 
-A node aplication using a MySQL database. User has option to either act as customer, manager, and supervisor.
+A node app using a MySQL database. User has option to either act as customer, manager, and supervisor.
 
 ## Customer Mode
 
